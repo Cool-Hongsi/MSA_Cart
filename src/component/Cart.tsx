@@ -1,38 +1,56 @@
 import React, { useState } from "react";
 import styles from "./Cart.module.css";
 
-type CartType = {
+interface IProductInfo {
   name: string;
-  price: number;
-};
+  price: string;
+}
 
-const cartList: CartType[] = [
-  {
-    name: "ABC",
-    price: 20,
-  },
-  {
-    name: "DEF",
-    price: 30,
-  },
-];
+interface ICart extends IProductInfo {
+  id: string;
+}
 
 const Cart = () => {
-  const [cart, setCart] = useState<CartType[]>([]);
+  const [productInfo, setProductInfo] = useState<IProductInfo>({
+    name: "",
+    price: "",
+  });
+  const [cart, setCart] = useState<ICart[]>([]);
 
-  const onClickSetCart = (cartList: CartType[]) => {
-    setCart([...cart, ...cartList]);
+  const handleProductInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setProductInfo({ ...productInfo, [name]: value });
+  };
+
+  const handleAddCart = () => {
+    if (productInfo.name && productInfo.price) {
+      setCart([...cart, { id: Date.now().toString(), ...productInfo }]);
+    }
   };
 
   return (
     <div className={styles.container}>
       <h2>This is Cart</h2>
-      <button onClick={() => onClickSetCart(cartList)}>Show Cart</button>
-      {cart.map((cart: CartType, index: number) => {
+      <input
+        placeholder="Product Name"
+        type="text"
+        name="name"
+        value={productInfo.name}
+        onChange={handleProductInfoChange}
+      />
+      <input
+        placeholder="Product Price"
+        type="text"
+        name="price"
+        value={productInfo.price}
+        onChange={handleProductInfoChange}
+      />
+      <button onClick={handleAddCart}>Add Cart</button>
+      {cart.map((cart: ICart) => {
         return (
-          <div key={index}>
+          <div key={cart.id}>
             <span>
-              {cart.name} / {cart.price.toString()}
+              {cart.name} / {cart.price}
             </span>
           </div>
         );
