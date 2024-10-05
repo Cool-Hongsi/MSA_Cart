@@ -48,19 +48,23 @@ module.exports = {
     }),
     // For MicroFrontend
     new ModuleFederationPlugin({
-      name: "cart",
-      filename: "remoteEntry.js", // should be js.. ts does NOT work
+      name: "remoteCart", // 해당 앱의 유니크한 이름 (중복 X)
+      filename: "remoteEntry.js", // 해당 앱을 다른 앱에서 사용하기 위한 정보가 담긴 파일 이름 지정
+      /*
+        remoteEntry.js가 사용되는 플로우
+        호스트앱이 열리고,
+        리모트앱에서 expose한 모듈에 대한 정보와 shared 의존성 패키지에 대한 정보가 담긴 remoteEntry.js를 각각 받아와 글로벌 변수에 저장한다.
+        expose된 모듈을 사용할 당시에, 저장해두었던 글로벌 변수를 통해 비동기적으로 모듈을 불러온다.
+      */
       exposes: {
-        "./Cart": "./src/component/Cart",
+        // key와 value로 이루어진 Object 형태로, 외부에서 사용하기 위해 노출시킬 모듈을 정의
+        "./Cart": "./src/component/Cart", // Cart 컴포넌트 이외에 다수 컴포넌트 노출 가능
       },
-      // If you specify your shared dependency as a singleton, they all consume the shared instance.
-      // And, eager means dependency will be ready to be consumed in the initial chunk.
       shared: {
         ...deps,
-        react: { singleton: true, eager: true, requiredVersion: deps.react },
+        react: { singleton: true, requiredVersion: deps.react },
         "react-dom": {
           singleton: true,
-          eager: true,
           requiredVersion: deps["react-dom"],
         },
       },
